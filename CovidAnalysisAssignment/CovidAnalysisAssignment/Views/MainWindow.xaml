@@ -1,0 +1,339 @@
+﻿<Window x:Class="CovidAnalysisAssignment.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        Title="{Binding Title}" Height="auto" Width="1950">
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <TabControl>
+            <TabItem Header="Tab 1">
+                <StackPanel >
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox ItemsSource="{Binding Months}"
+                     SelectedItem="{Binding SelectedMonth}"
+                      HorizontalAlignment="Left" Width="250" Height="30" Margin="10">
+                        </ComboBox>
+
+                        <Button Content="Browse File"
+                            Margin="10" 
+                            Height="30"
+                            Width="100"
+                            Command="{Binding ImportDataTab1}"/>
+
+                        <Button Command="{Binding ExportDataTab1}"
+                            Margin="10" 
+                            Height="30"
+                            Width="100">Export Data
+                        </Button>
+
+                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="500"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                            <DataGrid HorizontalContentAlignment="Left" Width="Auto" ItemsSource="{Binding CovidStatusToDisplay}" Grid.Column="0" AlternatingRowBackground = "LightBlue"
+                     AlternationCount="2" AutoGenerateColumns = "False" 
+                                      MaxHeight="720"
+                                      VerticalAlignment="Top"
+                              Margin="0,0,-85.6,-0.2" HorizontalAlignment="Left"  
+                              VerticalScrollBarVisibility="Visible" SelectedItem="SelectedDataGridItem">
+
+                                <DataGrid.Columns>
+                                    <!--<DataGridTextColumn Header = "Date" Binding = "{Binding Date}" />-->
+                                    <DataGridTextColumn Header = "State/UT" Binding = "{Binding State}" />
+                                    <DataGridTextColumn Header = "Cured" Binding = "{Binding Cured, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTextColumn Header = "Deaths" Binding = "{Binding Deaths}" />
+                                    <DataGridTextColumn Header = "Confirmed" Binding = "{Binding Confirmed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+                        </ScrollViewer>
+                        <GridSplitter HorizontalAlignment="Center"   
+                      VerticalAlignment="Stretch"   
+                      Grid.Column="1"   
+                      Width="5" Background="Silver">
+                        </GridSplitter>
+                        <StackPanel Grid.Row="0" Grid.Column="2">
+                            <ComboBox ItemsSource="{Binding States, Mode=TwoWay}"
+                              SelectedItem="{Binding SelectedState, Mode=TwoWay}"
+                              HorizontalAlignment="Left" Width="250" Height="30" Margin="10">
+
+                            </ComboBox>
+
+                            <oxy:Plot Title="Active Cases [Cases vs Date[dd/mm/yy]]" TitleFontWeight="Bold" TitleColor="DarkOrange"
+                              MinWidth="400" Height="240" HorizontalContentAlignment="Stretch"
+                              Margin="20"  >
+                                <oxy:Plot.Axes >
+                                    <oxy:DateTimeAxis StringFormat="dd/MM/yy"/>
+                                </oxy:Plot.Axes>
+                                <!--<oxy:Plot.Annotations >
+                            <oxy:RectangleAnnotation Text="Hii There" Height="100" Width="100" FontSize="30"  ></oxy:RectangleAnnotation>
+                        </oxy:Plot.Annotations>-->
+
+                                <oxy:Plot.Series>
+                                    <oxy:LineSeries DataFieldX="Date[dd/mm/yy]" DataFieldY="Cases" Color="DarkOrange" ItemsSource="{Binding ActiveCurvePoints, Mode=TwoWay}"/>
+                                </oxy:Plot.Series>
+
+                            </oxy:Plot>
+                            <StackPanel Orientation="Horizontal" Margin="70 0 0 0 ">
+                                <TextBlock Text="Total Active Cases: " Foreground="DarkOrange" FontSize="15"/>
+                                <TextBlock Text="{Binding totalActiveCases}" Foreground="DarkOrange" FontSize="15"/>
+                            </StackPanel>
+
+
+                            <oxy:Plot Title="Confirmed Cases [Cases vs Date[dd/mm/yy]]" TitleFontWeight="Bold" TitleColor="Yellow"
+                              MinWidth="400" Height="240" Margin="20" HorizontalContentAlignment="Stretch"
+                              >
+                                <oxy:Plot.Axes>
+                                    <oxy:DateTimeAxis StringFormat="dd/MM/yy"/>
+                                </oxy:Plot.Axes>
+                                <oxy:Plot.Series>
+                                    <oxy:LineSeries DataFieldX="Date[dd/mm/yy]" DataFieldY="Cases" Color="Yellow" ItemsSource="{Binding ConfirmedCasesPoints, Mode=TwoWay}"/>
+                                </oxy:Plot.Series>
+
+                            </oxy:Plot>
+                            <StackPanel Orientation="Horizontal" Margin="70 0 0 0 ">
+                                <TextBlock Text="Total Confirmed Cases: " Foreground="Yellow" FontSize="15"/>
+                                <TextBlock Text="{Binding totalConfirmedCases}" Foreground="Yellow" FontSize="15"/>
+                            </StackPanel>
+
+                            <oxy:Plot Title="Recovered Cases [Cases vs Date[dd/mm/yy]]" TitleFontWeight="Bold" TitleColor="Green"
+                              Margin="20" MinWidth="400" Height="240" HorizontalContentAlignment="Stretch">
+                                <oxy:Plot.Axes>
+                                    <oxy:DateTimeAxis StringFormat="dd/MM/yy"/>
+                                </oxy:Plot.Axes>
+                                <oxy:Plot.Series>
+                                    <oxy:LineSeries DataFieldX="Date[dd/mm/yy]" DataFieldY="Cases" Color="Green" ItemsSource="{Binding CuredCasesPoints, Mode=TwoWay}"/>
+                                </oxy:Plot.Series>
+                            </oxy:Plot>
+
+                            <StackPanel Orientation="Horizontal" Margin="70 0 0 0 ">
+                                <TextBlock Text="Total Recovered Cases: " Foreground="Green" FontSize="15"/>
+                                <TextBlock Text="{Binding totalRecoverdCases}" Foreground="Green" FontSize="15"/>
+                            </StackPanel>
+
+                            <oxy:Plot Title="Deaths [Cases vs Date[dd/mm/yy]]" TitleFontWeight="Bold" TitleColor="Red"
+                              Margin="20" MinWidth="400" Height="240" HorizontalContentAlignment="Stretch">
+                                <oxy:Plot.Axes>
+                                    <oxy:DateTimeAxis StringFormat="dd/MM/yy"/>
+                                </oxy:Plot.Axes>
+                                <oxy:Plot.Series>
+                                    <oxy:LineSeries DataFieldX="Date[dd/mm/yy]" DataFieldY="Cases" Color="Red" ItemsSource="{Binding DeathCurvePoints, Mode=TwoWay}"/>
+                                </oxy:Plot.Series>
+                            </oxy:Plot>
+
+                            <StackPanel Orientation="Horizontal" Margin="70 0 0 0 ">
+                                <TextBlock Text="Total Death Cases: " Foreground="Red" FontSize="15"/>
+                                <TextBlock Text="{Binding totalDeathCases}" Foreground="Red" FontSize="15"/>
+                            </StackPanel>
+
+
+
+
+                        </StackPanel>
+                    </Grid>
+
+
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Tab 2">
+                <StackPanel CanVerticallyScroll="True">
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox ItemsSource="{Binding Months}"
+                          SelectedItem="{Binding SelectedMonth}"
+                          Margin="10,10,0,13" 
+                          HorizontalAlignment="Left"   
+                          VerticalAlignment="Top" 
+                          Width="194" 
+                          Height="30">
+                        </ComboBox>
+                        <DatePicker Height="30" 
+                            Width="115"
+                            SelectedDate="{Binding SelectedDate}"
+                            HorizontalAlignment="Left" 
+                            DisplayDateStart="2021/01/16"
+                            Margin="10,10,0,13"
+                            Name="datePicker1" 
+                            VerticalAlignment="Top" />
+
+                        <Button Content="Browse File"
+                        Margin="10,10,0,13" 
+                        Height="30"
+                        Width="100"
+                        Command="{Binding ImportData}">
+                        </Button>
+                        <Button Content="Export Data"
+                        Margin="10,10,0,13" 
+                        Height="30"
+                        Width="100"
+                        Command="{Binding ExportData}">
+                        </Button>
+                    </StackPanel>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="700"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ContentControl prism:RegionManager.RegionName="ContentRegion" Margin="0,0,0.4,-0.2" />
+                        <DataGrid ItemsSource="{Binding VaccinationDataToDisplay}"
+                          Grid.Column="0"
+                          Name="dataGridView1"
+                          AlternatingRowBackground = "LightBlue"
+                          AlternationCount="2" 
+                          AutoGenerateColumns = "False" 
+                          Margin="0,0,-85.6,-0.2" 
+                          MaxHeight="720"
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Left" 
+                          VerticalScrollBarVisibility="Visible" 
+                          HorizontalScrollBarVisibility="Visible">
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header = "Date" Binding = "{Binding DateTime}" />
+                                <DataGridTextColumn Header = "State" Binding = "{Binding State}" Width="180" />
+                                <DataGridTextColumn Header = "Total Vaccinated" Binding = "{Binding TotalVaccinated}"/>
+                                <DataGridTextColumn Header = "First Dose" Binding = "{Binding FirstDose}" />
+                                <DataGridTextColumn Header = "Second Dose" Binding = "{Binding SecondDose}" />
+                                <DataGridTextColumn Header = "Covaxin" Binding = "{Binding Covaxin}" />
+                                <DataGridTextColumn Header = "Covishield" Binding = "{Binding Covishield}" />
+                                <DataGridTextColumn Header = "18 age group" Binding = "{Binding _18}" />
+                                <DataGridTextColumn Header = "45 age group" Binding = "{Binding _45}" />
+
+                            </DataGrid.Columns>
+
+                        </DataGrid>
+                        <Grid Width="650" Height="auto" 
+                      Grid.Column="1" 
+                      HorizontalAlignment="Center" 
+                      VerticalAlignment="Top">
+                            <StackPanel>
+
+                                <ComboBox ItemsSource="{Binding States}"
+                                  SelectedItem="{Binding SelectedState}"
+                                  Margin="10,10,0,13" HorizontalAlignment="Left"   
+                                  VerticalAlignment="Top" Width="194" Height="30">
+                                </ComboBox>
+
+                                <TextBlock Text="First Dose %"
+                                   FontSize="16"
+                                   Margin="10,0,0,0">
+
+                                </TextBlock>
+
+                                <Grid Margin="10,5,10,10">
+
+                                    <ProgressBar Minimum="0" 
+                                    Maximum="100" 
+                                    Value="{Binding FirstDoseStateWise}" 
+                                    Name="pbStatus" />
+                                    <TextBlock Text="{Binding ElementName=pbStatus, Path=Value, StringFormat={}{0:0}%}" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center" />
+                                </Grid>
+
+                                <TextBlock Text="Second Dose %"
+                                   FontSize="16"
+                                   Margin="10,0,0,0">
+
+                                </TextBlock>
+
+                                <Grid Margin="10,5,10,10">
+
+                                    <ProgressBar Minimum="0" 
+                                    Maximum="100" 
+                                    Value="{Binding SecondDoseStateWise}" 
+                                    Name="pbStatus2" />
+                                    <TextBlock Text="{Binding ElementName=pbStatus2, Path=Value, StringFormat={}{0:0}%}" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center" />
+                                </Grid>
+
+
+                                <oxy:Plot Title="18-44 Vaccinated vs Date (MM-dd format)"
+                                  HorizontalContentAlignment="Stretch" Height="400">
+                                    <oxy:Plot.Axes>
+                                        <oxy:DateTimeAxis Position="Bottom" StringFormat="MM/dd" />
+                                        <oxy:LinearAxis Position="Left"  />
+
+                                    </oxy:Plot.Axes>
+                                    <oxy:Plot.Series>
+                                        <oxy:AreaSeries ItemsSource="{Binding DatewiseStat_18}" 
+                                                DataFieldX="Date"                                                
+                                                DataFieldY="Value"
+                                                Color="Red"/>
+                                    </oxy:Plot.Series>
+
+                                </oxy:Plot>
+                                <oxy:Plot Title="Type of Vaccine vs Date (MM-dd format)"
+                                  HorizontalContentAlignment="Stretch" Height="400">
+                                    <oxy:Plot.Axes>
+                                        <oxy:DateTimeAxis Position="Bottom" StringFormat="MM/dd" />
+                                        <oxy:LinearAxis Position="Left"  />
+
+                                    </oxy:Plot.Axes>
+                                    <oxy:Plot.Series>
+                                        <oxy:LineSeries ItemsSource="{Binding Covaxin_45}" 
+                                                DataFieldX="Date"
+                                                DataFieldY="Value"
+                                                Title="Covaxin"
+                                                Color="Blue"/>
+                                        <oxy:LineSeries ItemsSource="{Binding Covishield_45}" 
+                                                DataFieldX="Date"
+                                                DataFieldY="Value"
+                                                Title="Covishield"
+                                                Color="Green"/>
+                                    </oxy:Plot.Series>
+
+                                </oxy:Plot>
+                                <oxy:Plot Title="FirstDose and SecondDose vs Date"
+                                  HorizontalContentAlignment="Stretch" Height="400">
+                                    <oxy:Plot.Axes>
+                                        <oxy:DateTimeAxis Position="Bottom" StringFormat="MM/dd" />
+                                        <oxy:LinearAxis Position="Left"  />
+
+                                    </oxy:Plot.Axes>
+                                    <oxy:Plot.Series>
+                                        <oxy:TwoColorAreaSeries ItemsSource="{Binding FirstDose}" 
+                                                DataFieldX="Date"
+                                                DataFieldY="Value"
+                                                Title="FirstDose"/>
+                                        <oxy:TwoColorAreaSeries ItemsSource="{Binding SecondDose}" 
+                                                DataFieldX="Date"
+                                                DataFieldY="Value"
+                                                Title="SecondDose"/>
+                                    </oxy:Plot.Series>
+
+                                </oxy:Plot>
+                            </StackPanel>
+
+
+
+                        </Grid>
+
+                    </Grid>
+
+
+                    <oxy:PlotView Model="{Binding BarModel}"  
+                          Margin="30"
+                          HorizontalAlignment="Center"
+                          HorizontalContentAlignment="Stretch"                                   
+                          Height="900"
+                          Width="1300"/>
+
+                </StackPanel>
+                
+                
+                
+                
+            </TabItem>
+        </TabControl>
+        
+    </ScrollViewer>
+</Window>
